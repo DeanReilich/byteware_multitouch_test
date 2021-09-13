@@ -1238,6 +1238,9 @@ Main.main = function() {
 	App.start("touch_test",800,1024,480,640);
 	App.onStarted.on(Main.preload);
 };
+Main.log = function(text) {
+	Main.additional_text += (Main.additional_text == "" ? "" : "\n") + text;
+};
 Main.preload = function() {
 	Res.addTexture("micro_font","micro_font.png");
 	Res.addString("micro_font","micro_font.fnt");
@@ -1266,7 +1269,8 @@ Main.precache = function() {
 		if(touch.id == 0) {
 			text += "STATE : " + Std.string(touch.state) + "\n";
 			text += "X     : " + App.root.pointer.x + "\n";
-			text += "Y     : " + App.root.pointer.y;
+			text += "Y     : " + App.root.pointer.y + "\n";
+			text += Main.additional_text;
 		}
 		Main.debug_text.set_text(text);
 		var marker1 = Main.markers[touch.id];
@@ -6301,6 +6305,8 @@ var platform_html5_HTML5Platform = function(app_name) {
 	this.c_renderer = new platform_html5_CanvasRenderer(canvas);
 	var last_touch = 0.0;
 	var mouse_down = false;
+	var mouse_logged = false;
+	var touch_logged = false;
 	content.style.msTouchAction = "none";
 	var onMouse = function(e) {
 		if(e.timeStamp - last_touch < 1000) {
@@ -6319,6 +6325,10 @@ var platform_html5_HTML5Platform = function(app_name) {
 			App.root.submitTouch(0,x2,y,byteware_input_TouchState.BEGIN);
 			canvas.focus();
 			mouse_down = true;
+			if(!mouse_logged) {
+				mouse_logged = true;
+				Main.log("Mouse event...");
+			}
 			break;
 		case "mousemove":
 			App.root.submitTouch(0,x2,y,mouse_down ? byteware_input_TouchState.MOVE : byteware_input_TouchState.OVER);
@@ -6353,6 +6363,10 @@ var platform_html5_HTML5Platform = function(app_name) {
 		case "MSPointerDown":case "pointerdown":case "touchstart":
 			e1.preventDefault();
 			App.root.submitTouch(0,(touch.clientX - bounds1.left) * _gthis.c_display.get_w() / bounds1.width,(touch.clientY - bounds1.top) * _gthis.c_display.get_h() / bounds1.height,byteware_input_TouchState.BEGIN);
+			if(!touch_logged) {
+				touch_logged = true;
+				Main.log("Touch event...");
+			}
 			break;
 		}
 	};
@@ -6708,6 +6722,7 @@ App.BOTTOM = 0;
 App.LEFT = 0;
 App.RIGHT = 0;
 Main.MAX_MARKERS = 10;
+Main.additional_text = "";
 MathTools.E = 1e-6;
 MathTools.PI = 3.141592653589793;
 MathTools.PQ = 0.7853981633974483;
