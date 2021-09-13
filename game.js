@@ -1251,7 +1251,7 @@ Main.precache = function() {
 	var bg = new FillRect(2302755,App.WIDTH,App.HEIGHT);
 	App.root.addChild(bg);
 	new byteware_format_FontFNT("micro_font",Res.getTexture("micro_font"),Res.getString("micro_font"),true,true);
-	Main.debug_text = new TextField("micro_font","",480,640,Direction.UP_LEFT,false,null,App.LEFT,App.TOP);
+	Main.debug_text = new TextField("micro_font","Touch screen to start...",480,640,Direction.UP_LEFT,false,null,App.LEFT,App.TOP);
 	Main.debug_text.set_isTouchable(false);
 	App.root.addChild(Main.debug_text);
 	App.onResize.on(function() {
