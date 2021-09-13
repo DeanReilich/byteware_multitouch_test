@@ -6347,42 +6347,56 @@ var platform_html5_HTML5Platform = function(app_name) {
 	canvas.addEventListener("mousewheel",onMouse,false);
 	canvas.addEventListener("DOMMouseScroll",onMouse,false);
 	var st_touch = typeof(window.ontouchstart) != "undefined";
-	var onTouch = function(e1) {
-		var touch = st_touch ? e1.changedTouches[0] : e1;
-		var bounds1 = e1.target.getBoundingClientRect();
-		last_touch = e1.timeStamp;
-		var _g1 = e1.type;
-		switch(_g1) {
-		case "MSPointerMove":case "pointermove":case "touchmove":
-			e1.preventDefault();
-			App.root.submitTouch(0,(touch.clientX - bounds1.left) * _gthis.c_display.get_w() / bounds1.width,(touch.clientY - bounds1.top) * _gthis.c_display.get_h() / bounds1.height,byteware_input_TouchState.MOVE);
-			break;
-		case "MSPointerUp":case "pointerup":case "touchcancel":case "touchend":
-			App.root.submitTouch(0,(touch.clientX - bounds1.left) * _gthis.c_display.get_w() / bounds1.width,(touch.clientY - bounds1.top) * _gthis.c_display.get_h() / bounds1.height,byteware_input_TouchState.END);
-			break;
-		case "MSPointerDown":case "pointerdown":case "touchstart":
-			e1.preventDefault();
-			App.root.submitTouch(0,(touch.clientX - bounds1.left) * _gthis.c_display.get_w() / bounds1.width,(touch.clientY - bounds1.top) * _gthis.c_display.get_h() / bounds1.height,byteware_input_TouchState.BEGIN);
-			if(!touch_logged) {
-				touch_logged = true;
-				Main.log("Touch event...");
+	var ms_touch = 'msMaxTouchPoints' in window.navigator && (window.navigator.msMaxTouchPoints > 1);
+	if(st_touch || ms_touch) {
+		var onTouch = function(e1) {
+			var touches = st_touch ? e1.changedTouches : [e1];
+			var bounds1 = e1.target.getBoundingClientRect();
+			last_touch = e1.timeStamp;
+			var _g1 = e1.type;
+			switch(_g1) {
+			case "MSPointerMove":case "pointermove":case "touchmove":
+				e1.preventDefault();
+				var _g2 = 0;
+				while(_g2 < touches.length) {
+					var touch = touches[_g2];
+					++_g2;
+					App.root.submitTouch((st_touch ? touch.identifier : touch.pointerId) | 0,(touch.clientX - bounds1.left) * _gthis.c_display.get_w() / bounds1.width,(touch.clientY - bounds1.top) * _gthis.c_display.get_h() / bounds1.height,byteware_input_TouchState.MOVE);
+				}
+				break;
+			case "MSPointerUp":case "pointerup":case "touchcancel":case "touchend":
+				var _g3 = 0;
+				while(_g3 < touches.length) {
+					var touch1 = touches[_g3];
+					++_g3;
+					App.root.submitTouch((st_touch ? touch1.identifier : touch1.pointerId) | 0,(touch1.clientX - bounds1.left) * _gthis.c_display.get_w() / bounds1.width,(touch1.clientY - bounds1.top) * _gthis.c_display.get_h() / bounds1.height,byteware_input_TouchState.END);
+				}
+				break;
+			case "MSPointerDown":case "pointerdown":case "touchstart":
+				e1.preventDefault();
+				var _g4 = 0;
+				while(_g4 < touches.length) {
+					var touch2 = touches[_g4];
+					++_g4;
+					App.root.submitTouch((st_touch ? touch2.identifier : touch2.pointerId) | 0,(touch2.clientX - bounds1.left) * _gthis.c_display.get_w() / bounds1.width,(touch2.clientY - bounds1.top) * _gthis.c_display.get_h() / bounds1.height,byteware_input_TouchState.BEGIN);
+				}
+				break;
 			}
-			break;
+		};
+		if(st_touch) {
+			canvas.addEventListener("touchstart",onTouch,false);
+			canvas.addEventListener("touchmove",onTouch,false);
+			canvas.addEventListener("touchend",onTouch,false);
+			canvas.addEventListener("touchcancel",onTouch,false);
+		} else {
+			canvas.addEventListener("MSPointerDown",onTouch,false);
+			canvas.addEventListener("MSPointerMove",onTouch,false);
+			canvas.addEventListener("MSPointerUp",onTouch,false);
 		}
-	};
-	if(st_touch) {
-		canvas.addEventListener("touchstart",onTouch,false);
-		canvas.addEventListener("touchmove",onTouch,false);
-		canvas.addEventListener("touchend",onTouch,false);
-		canvas.addEventListener("touchcancel",onTouch,false);
-	} else {
-		canvas.addEventListener("MSPointerDown",onTouch,false);
-		canvas.addEventListener("MSPointerMove",onTouch,false);
-		canvas.addEventListener("MSPointerUp",onTouch,false);
 	}
 	var onKey = function(e2) {
-		var _g2 = e2.type;
-		switch(_g2) {
+		var _g5 = e2.type;
+		switch(_g5) {
 		case "keydown":
 			break;
 		case "keyup":
