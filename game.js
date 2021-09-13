@@ -3983,7 +3983,7 @@ byteware_input_Touch.prototype = {
 	,__class__: byteware_input_Touch
 };
 var byteware_input_TouchProcessor = function() {
-	this.c_num_touches = 1;
+	this.c_num_touches = 10;
 	this.c_touches = [];
 	var i = -1;
 	while(++i < 10) this.c_touches[i] = new byteware_input_Touch(i);
